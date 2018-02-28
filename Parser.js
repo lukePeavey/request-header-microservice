@@ -1,27 +1,32 @@
 module.exports = class Parser {
   static parseRequest(req) {
     return {
-      ipaddress: Parser.getIP(req.connection.remoteAddress),
-      language: Parser.getLanguage(req.headers["accept-language"]),
-      software: Parser.getOS(req.headers["user-agent"])
+      ipaddress: Parser.getIP(req),
+      language: Parser.getLanguage(req.headers['accept-language']),
+      software: Parser.getOS(req.headers['user-agent'])
     }
   }
 
-  static getIP(remoteAddress) {
-    let isV6 = remoteAddress.indexOf(':') >= 0;
+  static getIP(req) {
+    const IP = (
+      req.headers['x-forwarded-for'] ||
+      req.connection.remoteAddress ||
+      req.socket.remoteAddress ||
+      req.connection.socket.remoteAddress
+    ).split(',')[0]
 
-    // We split the address every colon, then reverse the array
+    // If its V6, split the address every colon, then reverse the array
     // and grab the first item, which will be the actual IPv4 address
-    return isV6 ? remoteAddress.split(':').reverse()[0] : remoteAddress;
+    const isV6 = IP.includes(':')
+    return isV6 ? IP.split(':').reverse()[0] : IP
   }
 
   static getOS(userAgent) {
-    let osInfo = userAgent.split(/[\(\)]/)[1]; // We grab the second field with [1]
-    return osInfo.trim(); // Trim extra space
+    let osInfo = userAgent.split(/[\(\)]/)[1]
+    return osInfo.trim()
   }
 
   static getLanguage(acceptLanguage) {
-     // We take the first language in the list and trim extra spaces
-     return acceptLanguage.split(',')[0].trim();
+    return acceptLanguage.split(',')[0].trim()
   }
 }

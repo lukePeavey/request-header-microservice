@@ -5,7 +5,10 @@
   "main": "app.js",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.16.2"
+    "express": "^4.16.2",
+    "ejs": "latest",
+    "cors": "latest"
+
   },
   "scripts": {
     "test": "test",
